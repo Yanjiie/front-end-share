@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>React Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<script type="text/babel">
+    var sexMap = {
+        'true': "男",
+        'false': "女"
+    }
+    function genData(n) {
+        var ret = []
+        for (var i = 0; i < n; i++) {
+            ret.push({
+                name: Math.random(),
+                age: 3 + Math.ceil((Math.random() * 30)),
+                sex: sexMap[1 - Math.random() > 0.5],
+                desc: Math.random()
+            })
+        }
+        return ret
+    }
+   var array = []
+   var time = 0, id, now
+
+   class Table extends React.Component {
+        constructor(props) {
+            super(props);
+            // 设置 initial state 
+            now = new Date
+            this.state = { array: genData(1000) };
+        }
+        componentDidUpdate() {
+            var cost = new Date - now
+            console.log(time, " cost ", cost, 'ms')
+            time++
+            array.push(cost)
+            var that = this
+            if (array.length > 60) {
+                console.log('平均耗时 ', array.reduce(function (a, b) {
+                    return a + b
+                }, 0) / 60, 'ms')
+                array.shift()
+                console.log('更新平均耗时 ', array.reduce(function (a, b) {
+                    return a + b
+                }, 0) / 60, 'ms')
+            } else {
+                setTimeout(function(){
+                    now = new Date - 0
+                    that.setState({
+                        array: genData(1000)
+                    })
+                }, 200)
+            }
+        }
+        componentDidMount() {
+            var cost = new Date - now
+            console.log('total ' + (cost) + ' ms')
+            this.setState({
+                array: genData(1000)
+            })
+        }
+        render() {
+            return <table>
+                        <tbody>
+                            {
+                                this.state.array.map(function(obj,index){
+                                    return  (<tr key={index}>
+                                        {
+                                            Object.keys(obj).map(function(key){
+                                                return <td data-align={key === 'age'? 'left':'right'}  key={key}>{obj[key]}</td>
+                                            })
+                                        }
+                                    </tr>)
+                                })
+                            }
+                        </tbody>
+                   </table>
+        }
+   }
+
+   ReactDOM.render(
+        <Table />,
+        document.getElementById('example')
+    )
+
+</script>
+
+<body>
+    <div id="example"></div>
+</body>
+
+<!-- <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script> -->
+<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+</html>
